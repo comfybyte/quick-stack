@@ -4,7 +4,7 @@
     treefmt-nix.url = "github:numtide/treefmt-nix";
     utils.url = "github:numtide/flake-utils";
     parts.url = "github:hercules-ci/flake-parts";
-    rust-overlay = {
+    rust = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
@@ -13,15 +13,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs =
-    inputs@{ nixpkgs, parts, utils, rust-overlay, crane, treefmt-nix, ... }:
+  outputs = inputs@{ nixpkgs, parts, utils, rust, crane, treefmt-nix, ... }:
     parts.lib.mkFlake { inherit inputs; } {
       systems = utils.lib.defaultSystems;
 
-      perSystem = { pkgs, system, ... }:
+      perSystem = { system, ... }:
         let
-          overlays = [ (import rust-overlay) ];
           pname = "quick-stack";
+          pkgs = nixpkgs.legacyPackages.${system}.extend rust.overlays.default;
           rustToolchain = pkgs.pkgsBuildHost.rust-bin.fromRustupToolchainFile
             ./rust-toolchain.toml;
           craneLib = (crane.mkLib pkgs).overrideToolchain rustToolchain;
@@ -37,30 +36,22 @@
 
           treeFmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
         in {
-          _module.args.pkgs = import nixpkgs { inherit system overlays; };
-
           devShells.default = craneLib.devShell {
             inputsFrom = [ bin ];
             packages = with pkgs; [ just bacon ];
           };
 
-          # `nix build`.
-          packages = {
-            inherit bin;
-            default = bin;
-          };
+          packages.default = bin;
 
-          # `nix run`.
           apps.default = utils.lib.mkApp { drv = bin; };
 
-          # `nix flake check`.
           checks = {
             inherit bin;
             fmt = craneLib.cargoFmt { inherit src; };
             clippy =
               craneLib.cargoClippy (commonArgs // { inherit cargoArtifacts; });
           };
-          # `nix fmt`
+
           formatter = treeFmtEval.config.build.wrapper;
         };
     };
