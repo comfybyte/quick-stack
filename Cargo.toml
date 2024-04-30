@@ -1,15 +1,19 @@
 [package]
 name = "quick-stack"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2021"
 
 [dependencies]
+anyhow = "1.0.82"
 better-panic = "0.3.0"
+clap = { version = "4.5.4", features = ["cargo"] }
+xdg = "2.5.2"
 
 [lints.rust]
 unsafe_code = "forbid"
 
 [lints.clippy]
+missing_errors_doc = { level = "allow", priority = 3 }
 pedantic = { level = "deny", priority = 2 }
 nursery = { level = "deny", priority = 1 }
 unwrap_used = { level = "deny", priority = 0 }
