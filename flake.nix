@@ -15,7 +15,7 @@
   };
   outputs = inputs@{ nixpkgs, parts, utils, rust, crane, treefmt-nix, ... }:
     parts.lib.mkFlake { inherit inputs; } {
-      systems = utils.lib.defaultSystems;
+      systems = [ "x86_64-linux" ];
 
       perSystem = { system, ... }:
         let
