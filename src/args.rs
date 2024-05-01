@@ -15,7 +15,7 @@ pub fn from() -> Arg {
         .long("from")
         .short('f')
         .value_name("PATH")
-        .help("Where to read file from.")
+        .help("Where to read files from.")
 }
 
 #[must_use]

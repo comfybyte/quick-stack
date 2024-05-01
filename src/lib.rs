@@ -10,8 +10,11 @@ pub mod commands;
 
 #[derive(Debug)]
 pub struct Rule {
+    /// A pattern to match against.
     matching: String,
+    /// A path to read files from.
     from: PathBuf,
+    /// A path to place files at.
     to: PathBuf,
 }
 impl From<&Rule> for String {
@@ -38,11 +41,14 @@ impl Rulefile {
     /// Call `Self.save` to write any changes to disk.
     ///
     /// # Errors
-    /// If the `rulefile` can't be accessed, created or if it can't be parsed (from malformatting).
-    pub fn new() -> Result<Self> {
+    /// If the file can't be read or parsed into `Self`'s format.
+    pub fn load() -> Result<Self> {
         Self::read_as_string()?.try_into()
     }
-    /// Reads the `rulefile` into a string.
+    /// Reads the `rulefile` into a string and returns it.
+    ///
+    /// # Errors
+    /// If the file can't be read if exists or created if not, or parsed into a string.
     pub fn read_as_string() -> Result<String> {
         let file = OpenOptions::new()
             .read(true)
@@ -53,9 +59,8 @@ impl Rulefile {
             .bytes()
             .flatten()
             .collect::<Vec<u8>>();
-        let content = String::from_utf8(file)?;
 
-        Ok(content)
+        Ok(String::from_utf8(file)?)
     }
     /// Overwrites the `rulefile` with this instance's.
     pub fn save(&self) -> Result<()> {
@@ -68,7 +73,13 @@ impl Rulefile {
 
         Ok(())
     }
-    /// Sugar over pushing to `self.rules` to allow chaining.
+    /// Purges all rules and calls `Self.save`.
+    pub fn clear(&mut self) -> Result<()> {
+        self.rules.clear();
+        self.save()?;
+        Ok(())
+    }
+    /// Shorthand for `Self.rules.push` with chaining.
     #[must_use]
     pub fn push(mut self, rule: Rule) -> Self {
         self.rules.push(rule);

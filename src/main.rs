@@ -12,16 +12,25 @@ fn cli() -> Command {
                 .about("Add a new sorting rule.")
                 .arg(args::matching().required(true))
                 .arg(args::from().required(true))
-                .arg(args::to().required(true)),
+                .arg(args::to().required(true))
+                .after_help("`matching` may take regular expressions (no wrapping / needed)."),
         )
+        .subcommand(Command::new("sort").about("Quickstack files according to sorting rules."))
+        .subcommand(Command::new("clear").about("Clear all rules."))
 }
 
 fn main() -> anyhow::Result<()> {
     better_panic::install();
+    tracing_subscriber::fmt::init();
 
     match cli().get_matches().subcommand() {
         Some(("add", sub_args)) => commands::parse::add(sub_args),
-        _ => unreachable!(),
+        Some(("sort", _)) => commands::sort(),
+        Some(("clear", _)) => commands::clear(),
+        _ => {
+            cli().print_help()?;
+            Ok(())
+        }
     }?;
 
     Ok(())
