@@ -17,6 +17,7 @@ fn cli() -> Command {
         )
         .subcommand(Command::new("sort").about("Quickstack files according to sorting rules."))
         .subcommand(Command::new("clear").about("Clear all rules."))
+        .subcommand(Command::new("ls").about("Lists all rules."))
 }
 
 fn main() -> anyhow::Result<()> {
@@ -27,6 +28,7 @@ fn main() -> anyhow::Result<()> {
         Some(("add", sub_args)) => commands::parse::add(sub_args),
         Some(("sort", _)) => commands::sort(),
         Some(("clear", _)) => commands::clear(),
+        Some(("ls", _)) => commands::ls(),
         _ => {
             cli().print_help()?;
             Ok(())

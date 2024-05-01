@@ -60,3 +60,37 @@ pub fn clear() -> Result<()> {
     println!("Cleared all rules.");
     Ok(())
 }
+
+pub fn ls() -> Result<()> {
+    use colored::Colorize;
+
+    let rulefile = Rulefile::load()?;
+
+    if rulefile.rules.is_empty() {
+        println!("there are no rules defined.");
+    } else {
+        println!(
+            "there are currently {} rules defined:",
+            rulefile.rules.len().to_string().bold().blue()
+        );
+        rulefile.rules.iter().enumerate().for_each(|(i, rule)| {
+            println!(
+                "[{}] {} {}\n    {} {} {} {}",
+                i + 1,
+                "for".green(),
+                rule.matching,
+                "do".red(),
+                rule.from.display(),
+                "-->".red(),
+                rule.to.display()
+            );
+        });
+        println!(
+            "\nuse {} to remove rules or {} to manually edit the rule file.",
+            "rm".blue(),
+            "edit".blue()
+        );
+    }
+
+    Ok(())
+}
