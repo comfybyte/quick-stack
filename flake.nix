@@ -19,31 +19,26 @@
 
       perSystem = { system, ... }:
         let
-          pname = "quick-stack";
           pkgs = nixpkgs.legacyPackages.${system}.extend rust.overlays.default;
           rustToolchain = pkgs.pkgsBuildHost.rust-bin.fromRustupToolchainFile
             ./rust-toolchain.toml;
           craneLib = (crane.mkLib pkgs).overrideToolchain rustToolchain;
           src = craneLib.cleanCargoSource (craneLib.path ./.);
           commonArgs = {
-            inherit pname src;
+            inherit src;
             strictDeps = true;
-            version = "0.1";
           };
           cargoArtifacts = craneLib.buildDepsOnly commonArgs;
           bin =
             craneLib.buildPackage (commonArgs // { inherit cargoArtifacts; });
-
           treeFmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
         in {
           devShells.default = craneLib.devShell {
             inputsFrom = [ bin ];
-            packages = with pkgs; [ just bacon ];
+            packages = with pkgs; [ just bacon cargo-udeps ];
           };
 
           packages.default = bin;
-
-          apps.default = utils.lib.mkApp { drv = bin; };
 
           checks = {
             inherit bin;
