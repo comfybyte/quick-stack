@@ -1,5 +1,6 @@
 #![deny(clippy::nursery)]
 #![deny(clippy::pedantic)]
+#![deny(clippy::unwrap_used)]
 #![allow(clippy::missing_errors_doc)]
 
 use anyhow::Result;
@@ -37,7 +38,8 @@ pub struct Rulefile {
     rules: Vec<Rule>,
 }
 impl Rulefile {
-    fn default_path() -> Result<PathBuf> {
+    /// Returns the path to the rulefile.
+    pub fn default_path() -> Result<PathBuf> {
         Ok(xdg_dirs()?.place_data_file("rulefile")?)
     }
 

@@ -17,7 +17,8 @@ fn cli() -> Command {
         )
         .subcommand(Command::new("sort").about("Quickstack files according to sorting rules."))
         .subcommand(Command::new("clear").about("Clear all rules."))
-        .subcommand(Command::new("ls").about("Lists all rules."))
+        .subcommand(Command::new("ls").about("List all rules."))
+        .subcommand(Command::new("edit").about("Open the file containing all rules for editing."))
 }
 
 fn main() -> anyhow::Result<()> {
@@ -29,6 +30,7 @@ fn main() -> anyhow::Result<()> {
         Some(("sort", _)) => commands::sort(),
         Some(("clear", _)) => commands::clear(),
         Some(("ls", _)) => commands::ls(),
+        Some(("edit", _)) => commands::edit(),
         _ => {
             cli().print_help()?;
             Ok(())

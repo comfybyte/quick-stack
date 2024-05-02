@@ -1,6 +1,6 @@
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use regex::Regex;
-use std::{fs, path::PathBuf};
+use std::{fs, io::stdout, path::PathBuf, process::Command};
 use tracing::{error, warn};
 
 use crate::{Rule, Rulefile};
@@ -119,6 +119,28 @@ pub fn rm() -> Result<()> {
     todo!()
 }
 
+/// Opens the rulefile for editing with $EDITOR.
 pub fn edit() -> Result<()> {
-    todo!()
+    use colored::Colorize;
+
+    let Ok(editor) = std::env::var("EDITOR") else {
+        eprintln!("{} requires $EDITOR to be set.", "edit".bright_red());
+        return Ok(());
+    };
+    let path = Rulefile::default_path()?;
+    let Some(path) = path.to_str() else {
+        return Err(anyhow!("failed to convert rulefile path to &str."));
+    };
+
+    if let Err(err) = Command::new("sh")
+        .arg("-c")
+        .arg(format!("{editor} {path}"))
+        .stdout(stdout())
+        .output()
+    {
+        eprintln!("couldn't open file for edit with $EDITOR: {err}",);
+    }
+
+    println!("{}", "editing done.".bright_blue());
+    Ok(())
 }
