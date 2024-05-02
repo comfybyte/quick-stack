@@ -6,7 +6,7 @@ pub fn matching() -> Arg {
         .long("matching")
         .short('m')
         .value_name("PATTERN")
-        .help("A file name pattern to match this rule.")
+        .help("A regular expression to match files against. (without /'s)")
 }
 
 #[must_use]
@@ -15,7 +15,7 @@ pub fn from() -> Arg {
         .long("from")
         .short('f')
         .value_name("PATH")
-        .help("Where to read files from.")
+        .help("A directory to read files from.")
 }
 
 #[must_use]
@@ -24,5 +24,5 @@ pub fn to() -> Arg {
         .long("to")
         .short('t')
         .value_name("PATH")
-        .help("Where to place files after quick stacking.")
+        .help("A directory to place matching files at.")
 }

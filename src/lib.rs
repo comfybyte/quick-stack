@@ -37,18 +37,16 @@ pub struct Rulefile {
     rules: Vec<Rule>,
 }
 impl Rulefile {
-    /// Gets the path of the `rulefile`.
     fn default_path() -> Result<PathBuf> {
         Ok(xdg_dirs()?.place_data_file("rulefile")?)
     }
 
-    /// Reads the `rulefile` and parses it into a manipulatable instance.
-    /// Call `Self.save` to write any changes to disk.
+    /// Returns a manipulatable instance of the rulefile.
     pub fn load() -> Result<Self> {
         Self::read_as_string()?.try_into()
     }
 
-    /// Reads the `rulefile` into a string and returns it.
+    /// Reads the rulefile into a string and return it.
     pub fn read_as_string() -> Result<String> {
         let file = OpenOptions::new()
             .read(true)
@@ -63,7 +61,7 @@ impl Rulefile {
         Ok(String::from_utf8(file)?)
     }
 
-    /// Overwrites the `rulefile` with this instance's.
+    /// Writes to disk any changes made to this instance.
     pub fn save(&self) -> Result<()> {
         let mut file = OpenOptions::new()
             .write(true)
@@ -73,20 +71,6 @@ impl Rulefile {
         file.write_all(String::from(self).as_bytes())?;
 
         Ok(())
-    }
-
-    /// Purges all rules and calls `Self.save`.
-    pub fn clear(&mut self) -> Result<()> {
-        self.rules.clear();
-        self.save()?;
-        Ok(())
-    }
-
-    /// Shorthand for `Self.rules.push` with chaining.
-    #[must_use]
-    pub fn push(mut self, rule: Rule) -> Self {
-        self.rules.push(rule);
-        self
     }
 }
 

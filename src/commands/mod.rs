@@ -22,10 +22,11 @@ pub fn add(matching: String, from: PathBuf, to: PathBuf) -> Result<()> {
         rule.to.display()
     );
 
-    let rulefile = Rulefile::load()?.push(rule);
-    let last_num = rulefile.rules.len() + 1;
+    let mut rulefile = Rulefile::load()?;
+    rulefile.rules.push(rule);
     rulefile.save()?;
 
+    let last_num = rulefile.rules.len() + 1;
     println!("\nrule added as #{}.", last_num.to_string().blue());
     Ok(())
 }
@@ -71,7 +72,10 @@ pub fn sort() -> Result<()> {
 
 /// Delete all rules.
 pub fn clear() -> Result<()> {
-    Rulefile::load()?.clear()?;
+    let mut rulefile = Rulefile::load()?;
+    rulefile.rules.clear();
+    rulefile.save()?;
+
     println!("Cleared all rules.");
     Ok(())
 }
