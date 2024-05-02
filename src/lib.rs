@@ -1,3 +1,7 @@
+#![deny(clippy::nursery)]
+#![deny(clippy::pedantic)]
+#![allow(clippy::missing_errors_doc)]
+
 use anyhow::Result;
 use std::{
     fs::OpenOptions,
@@ -37,18 +41,14 @@ impl Rulefile {
     fn default_path() -> Result<PathBuf> {
         Ok(xdg_dirs()?.place_data_file("rulefile")?)
     }
+
     /// Reads the `rulefile` and parses it into a manipulatable instance.
     /// Call `Self.save` to write any changes to disk.
-    ///
-    /// # Errors
-    /// If the file can't be read or parsed into `Self`'s format.
     pub fn load() -> Result<Self> {
         Self::read_as_string()?.try_into()
     }
+
     /// Reads the `rulefile` into a string and returns it.
-    ///
-    /// # Errors
-    /// If the file can't be read if exists or created if not, or parsed into a string.
     pub fn read_as_string() -> Result<String> {
         let file = OpenOptions::new()
             .read(true)
@@ -62,6 +62,7 @@ impl Rulefile {
 
         Ok(String::from_utf8(file)?)
     }
+
     /// Overwrites the `rulefile` with this instance's.
     pub fn save(&self) -> Result<()> {
         let mut file = OpenOptions::new()
@@ -73,12 +74,14 @@ impl Rulefile {
 
         Ok(())
     }
+
     /// Purges all rules and calls `Self.save`.
     pub fn clear(&mut self) -> Result<()> {
         self.rules.clear();
         self.save()?;
         Ok(())
     }
+
     /// Shorthand for `Self.rules.push` with chaining.
     #[must_use]
     pub fn push(mut self, rule: Rule) -> Self {

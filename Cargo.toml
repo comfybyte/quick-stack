@@ -13,15 +13,6 @@ tracing = "0.1.40"
 tracing-subscriber = "0.3.18"
 xdg = "2.5.2"
 
-[lints.rust]
-unsafe_code = "forbid"
-
-[lints.clippy]
-missing_errors_doc = { level = "allow", priority = 3 }
-pedantic = { level = "deny", priority = 2 }
-nursery = { level = "deny", priority = 1 }
-unwrap_used = { level = "deny", priority = 0 }
-
 [profile.release]
 lto = true
 codegen-units = 1
