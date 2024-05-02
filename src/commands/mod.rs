@@ -9,15 +9,30 @@ pub mod parse;
 
 /// Append item to rule file.
 pub fn add(matching: String, from: PathBuf, to: PathBuf) -> Result<()> {
+    use colored::Colorize;
+
     let rule = Rule { matching, from, to };
-    println!("Adding rule: {rule:?}");
-    Rulefile::load()?.push(rule).save()?;
-    println!("Done.");
+    println!(
+        "adding rule:\n{} {}\n  {} {} {} {}",
+        "for".bright_blue(),
+        rule.matching,
+        "do".blue(),
+        rule.from.display(),
+        "-->".blue(),
+        rule.to.display()
+    );
+
+    let rulefile = Rulefile::load()?.push(rule);
+    let last_num = rulefile.rules.len() + 1;
+    rulefile.save()?;
+
+    println!("\nrule added as #{}.", last_num.to_string().blue());
     Ok(())
 }
 
 /// Go through each rule's `from` directory, moving everything that matches `matching` into `to`.
 pub fn sort() -> Result<()> {
+    // TODO: Optimise this.
     for rule in Rulefile::load()?.rules {
         let mut target_files = match fs::read_dir(&rule.from) {
             Ok(target_files) => target_files,
@@ -54,13 +69,14 @@ pub fn sort() -> Result<()> {
     Ok(())
 }
 
-/// Clears the `rulefile`.
+/// Delete all rules.
 pub fn clear() -> Result<()> {
     Rulefile::load()?.clear()?;
     println!("Cleared all rules.");
     Ok(())
 }
 
+/// Pretty-prints saved rules.
 pub fn ls() -> Result<()> {
     use colored::Colorize;
 
@@ -77,20 +93,28 @@ pub fn ls() -> Result<()> {
             println!(
                 "[{}] {} {}\n    {} {} {} {}",
                 i + 1,
-                "for".green(),
+                "for".bright_blue(),
                 rule.matching,
-                "do".red(),
+                "do".blue(),
                 rule.from.display(),
-                "-->".red(),
+                "-->".blue(),
                 rule.to.display()
             );
         });
         println!(
             "\nuse {} to remove rules or {} to manually edit the rule file.",
-            "rm".blue(),
-            "edit".blue()
+            "rm".red(),
+            "edit".red()
         );
     }
 
     Ok(())
+}
+
+pub fn rm() -> Result<()> {
+    todo!()
+}
+
+pub fn edit() -> Result<()> {
+    todo!()
 }
