@@ -1,9 +1,12 @@
 _default:
   just --list
+
 check:
   nix fmt
-  nix flake check
+  cargo clippy
+
 watch:
   bacon clippy
+
 udeps:
   cargo udeps

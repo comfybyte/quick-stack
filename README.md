@@ -34,9 +34,4 @@ quick-stack add -m "(?i)(*.)gundam(.*).mkv$" -f ~/downloads -t ~/anime/gundam
 Use `quick-stack sort`. It will skip rules that read from or write to directories that it can't access, be it because of permission errors or 
 because they don't exist (It won't create directories, yet.).
 
-
-#### Other useful commands
-- `ls` to list all rules.
-- `clear` to delete all rules.
-- `edit` to open the save file with your `$EDITOR`.
-- `rm` to remove certain rules.
+See `quick-stack --help` for other useful commands.
