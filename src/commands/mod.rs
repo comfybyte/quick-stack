@@ -1,14 +1,18 @@
 use anyhow::{anyhow, Result};
-use std::{fs, io::stdout, path::PathBuf, process::Command};
-use tracing::{error, warn};
+use colored::Colorize;
+use std::{
+    fs,
+    io::{self, stdout},
+    path::PathBuf,
+    process::Command,
+};
+use tracing::warn;
 
 use crate::{Rule, Rulefile};
 
 pub mod parse;
 
 pub fn add(matching: String, from: PathBuf, to: PathBuf) -> Result<()> {
-    use colored::Colorize;
-
     let rule = Rule { matching, from, to };
     println!(
         "adding rule:\n{} {}\n  {} {} {} {}",
@@ -30,6 +34,7 @@ pub fn add(matching: String, from: PathBuf, to: PathBuf) -> Result<()> {
 }
 
 pub fn sort() -> Result<()> {
+    use io::ErrorKind;
     use regex::Regex;
 
     // TODO: Optimise this.
@@ -59,8 +64,31 @@ pub fn sort() -> Result<()> {
                 new.push(&name);
 
                 if let Err(err) = fs::rename(&old, &new) {
-                    error!("couldn't move {old:?} -> {new:?}: {err:?}");
-                    continue;
+                    match err.kind() {
+                        ErrorKind::NotFound => {
+                            println!("rule output directory not found, creating it...");
+
+                            if let Err(err) = fs::create_dir(&rule.to) {
+                                eprintln!("can't create output directory: {err:?}");
+                                continue;
+                            }
+
+                            println!("{}'{}'", "created".green(), &rule.to.display());
+
+                            if let Err(err) = fs::rename(&old, &new) {
+                                eprintln!("can't stack file: {err:?}");
+                            }
+                        }
+                        ErrorKind::NotADirectory => {
+                            eprintln!(
+                                "can't stack file: {} exists and is not a directory.",
+                                rule.to.display()
+                            );
+                        }
+                        _ => {
+                            eprintln!("can't stack file: {err:?}");
+                        }
+                    }
                 }
             }
         }
@@ -79,8 +107,6 @@ pub fn clear() -> Result<()> {
 }
 
 pub fn ls() -> Result<()> {
-    use colored::Colorize;
-
     let rulefile = Rulefile::load()?;
 
     if rulefile.rules.is_empty() {
@@ -113,8 +139,6 @@ pub fn ls() -> Result<()> {
 }
 
 pub fn edit() -> Result<()> {
-    use colored::Colorize;
-
     let Ok(editor) = std::env::var("EDITOR") else {
         eprintln!("{} requires $EDITOR to be set.", "edit".bright_red());
         return Ok(());
@@ -138,8 +162,6 @@ pub fn edit() -> Result<()> {
 }
 
 pub fn rm(numbers: &[usize]) -> Result<()> {
-    use colored::Colorize;
-
     let mut rulefile = Rulefile::load()?;
     rulefile.rules = rulefile
         .rules
