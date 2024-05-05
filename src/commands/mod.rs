@@ -12,23 +12,27 @@ use crate::{Rule, Rulefile};
 
 pub mod parse;
 
-pub fn add(matching: String, from: PathBuf, to: PathBuf) -> Result<()> {
-    let rule = Rule { matching, from, to };
+pub fn add(matching: String, input: PathBuf, output: PathBuf) -> Result<()> {
+    let rule = Rule {
+        matching,
+        input,
+        output,
+    };
     println!(
         "adding rule:\n{} {}\n  {} {} {} {}",
         "for".bright_blue(),
         rule.matching,
         "do".blue(),
-        rule.from.display(),
+        rule.input.display(),
         "-->".blue(),
-        rule.to.display()
+        rule.output.display()
     );
 
     let mut rulefile = Rulefile::load()?;
     rulefile.rules.push(rule);
     rulefile.save()?;
 
-    let last_num = rulefile.rules.len() + 1;
+    let last_num = rulefile.rules.len();
     println!("\nrule added as #{}.", last_num.to_string().blue());
     Ok(())
 }
@@ -39,10 +43,10 @@ pub fn sort() -> Result<()> {
 
     // TODO: Optimise this.
     for rule in Rulefile::load()?.rules {
-        let mut target_files = match fs::read_dir(&rule.from) {
+        let mut target_files = match fs::read_dir(&rule.input) {
             Ok(target_files) => target_files,
             Err(err) => {
-                warn!("skipping rule: `from` does not point to a readable directory:\nin rule: {rule:?}\ncause: {err:?}");
+                warn!("skipping rule: `input` does not point to a readable directory:\nin rule: {rule:?}\ncause: {err:?}");
                 continue;
             }
         };
@@ -58,9 +62,9 @@ pub fn sort() -> Result<()> {
             };
 
             if matching.is_match(&name) {
-                let mut old = rule.from.clone();
+                let mut old = rule.input.clone();
                 old.push(&name);
-                let mut new = rule.to.clone();
+                let mut new = rule.output.clone();
                 new.push(&name);
 
                 if let Err(err) = fs::rename(&old, &new) {
@@ -68,12 +72,12 @@ pub fn sort() -> Result<()> {
                         ErrorKind::NotFound => {
                             println!("rule output directory not found, creating it...");
 
-                            if let Err(err) = fs::create_dir(&rule.to) {
+                            if let Err(err) = fs::create_dir(&rule.output) {
                                 eprintln!("can't create output directory: {err:?}");
                                 continue;
                             }
 
-                            println!("{}'{}'", "created".green(), &rule.to.display());
+                            println!("{}'{}'", "created".green(), &rule.output.display());
 
                             if let Err(err) = fs::rename(&old, &new) {
                                 eprintln!("can't stack file: {err:?}");
@@ -82,7 +86,7 @@ pub fn sort() -> Result<()> {
                         ErrorKind::NotADirectory => {
                             eprintln!(
                                 "can't stack file: {} exists and is not a directory.",
-                                rule.to.display()
+                                rule.output.display()
                             );
                         }
                         _ => {
@@ -123,9 +127,9 @@ pub fn ls() -> Result<()> {
                 "for".bright_blue(),
                 rule.matching,
                 "do".blue(),
-                rule.from.display(),
+                rule.input.display(),
                 "-->".blue(),
-                rule.to.display()
+                rule.output.display()
             );
         });
         println!(

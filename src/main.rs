@@ -11,8 +11,8 @@ fn cli() -> Command {
             Command::new("add")
                 .about("Add a new sorting rule.")
                 .arg(args::matching().required(true))
-                .arg(args::from().required(true))
-                .arg(args::to().required(true))
+                .arg(args::input().required(true))
+                .arg(args::output().required(true))
                 .after_help("`matching` may take regular expressions (no wrapping / needed)."),
         )
         .subcommand(Command::new("sort").about("Quickstack files according to sorting rules."))

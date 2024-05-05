@@ -10,19 +10,19 @@ pub fn matching() -> Arg {
 }
 
 #[must_use]
-pub fn from() -> Arg {
-    Arg::new("from")
-        .long("from")
-        .short('f')
+pub fn input() -> Arg {
+    Arg::new("input")
+        .long("in")
+        .short('i')
         .value_name("PATH")
         .help("A directory to read files from.")
 }
 
 #[must_use]
-pub fn to() -> Arg {
-    Arg::new("to")
-        .long("to")
-        .short('t')
+pub fn output() -> Arg {
+    Arg::new("output")
+        .long("out")
+        .short('o')
         .value_name("PATH")
         .help("A directory to place matching files at.")
 }

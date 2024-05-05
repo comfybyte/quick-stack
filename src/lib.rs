@@ -19,17 +19,17 @@ pub struct Rule {
     /// A pattern to match against.
     matching: String,
     /// A path to read files from.
-    from: PathBuf,
+    input: PathBuf,
     /// A path to place files at.
-    to: PathBuf,
+    output: PathBuf,
 }
 impl From<&Rule> for String {
     fn from(value: &Rule) -> Self {
         format!(
             "{}\n{}\n{}",
             value.matching,
-            value.from.display(),
-            value.to.display()
+            value.input.display(),
+            value.output.display()
         )
     }
 }
@@ -95,8 +95,8 @@ impl TryFrom<String> for Rulefile {
                     Rule {
                         // TODO: Use `return`s instead of panicking like an idiot.
                         matching: lines.next().expect(BROKEN_RULE).into(),
-                        from: lines.next().expect(BROKEN_RULE).into(),
-                        to: lines.next().expect(BROKEN_RULE).into(),
+                        input: lines.next().expect(BROKEN_RULE).into(),
+                        output: lines.next().expect(BROKEN_RULE).into(),
                     }
                 })
                 .collect();

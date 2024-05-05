@@ -7,18 +7,18 @@ pub fn add(args: &ArgMatches) -> Result<()> {
         Ok(None) => unreachable!(),
         Err(err) => return Err(anyhow!("parsing error: {err:?}")),
     };
-    let from = match args.try_get_one::<String>("from") {
+    let input = match args.try_get_one::<String>("input") {
         Ok(Some(from)) => from.clone(),
         Ok(None) => unreachable!(),
         Err(err) => return Err(anyhow!("parsing error: {err:?}")),
     };
-    let to = match args.try_get_one::<String>("to") {
+    let output = match args.try_get_one::<String>("output") {
         Ok(Some(to)) => to.clone(),
         Ok(None) => unreachable!(),
         Err(err) => return Err(anyhow!("parsing error: {err:?}")),
     };
 
-    super::add(matching, from.into(), to.into())?;
+    super::add(matching, input.into(), output.into())?;
     Ok(())
 }
 

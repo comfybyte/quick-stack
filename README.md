@@ -33,11 +33,11 @@ We work with rules here, define what should go where, then snap your fingers and
 
 #### Creating a rule
 Use `quick-stack add` to add a new rule, it takes three arguments: `-m` is a regular expression to match files ,
-`-f` is a path to read files from, and `-t` is a path to place files at. For example:
+`-i` is a path to read files from, and `-o` is a path to place files at. For example:
 ```sh
-quick-stack add -m ".png$" -f ~/downloads -t ~/imgs
+quick-stack add -m ".png$" -i ~/downloads -o ~/imgs
 # ...or
-quick-stack add -m "(?i)(*.)gundam(.*).mkv$" -f ~/downloads -t ~/anime/gundam
+quick-stack add -m "(?i)(*.)gundam(.*).mkv$" -i ~/downloads -o ~/anime/gundam
 ```
 
 
