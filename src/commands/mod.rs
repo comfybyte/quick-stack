@@ -1,5 +1,4 @@
 use anyhow::{anyhow, Result};
-use regex::Regex;
 use std::{fs, io::stdout, path::PathBuf, process::Command};
 use tracing::{error, warn};
 
@@ -7,7 +6,6 @@ use crate::{Rule, Rulefile};
 
 pub mod parse;
 
-/// Append item to rule file.
 pub fn add(matching: String, from: PathBuf, to: PathBuf) -> Result<()> {
     use colored::Colorize;
 
@@ -31,8 +29,9 @@ pub fn add(matching: String, from: PathBuf, to: PathBuf) -> Result<()> {
     Ok(())
 }
 
-/// Go through each rule's `from` directory, moving everything that matches `matching` into `to`.
 pub fn sort() -> Result<()> {
+    use regex::Regex;
+
     // TODO: Optimise this.
     for rule in Rulefile::load()?.rules {
         let mut target_files = match fs::read_dir(&rule.from) {
@@ -70,7 +69,6 @@ pub fn sort() -> Result<()> {
     Ok(())
 }
 
-/// Delete all rules.
 pub fn clear() -> Result<()> {
     let mut rulefile = Rulefile::load()?;
     rulefile.rules.clear();
@@ -80,7 +78,6 @@ pub fn clear() -> Result<()> {
     Ok(())
 }
 
-/// Pretty-prints saved rules.
 pub fn ls() -> Result<()> {
     use colored::Colorize;
 
@@ -115,11 +112,6 @@ pub fn ls() -> Result<()> {
     Ok(())
 }
 
-pub fn rm() -> Result<()> {
-    todo!()
-}
-
-/// Opens the rulefile for editing with $EDITOR.
 pub fn edit() -> Result<()> {
     use colored::Colorize;
 
@@ -142,5 +134,30 @@ pub fn edit() -> Result<()> {
     }
 
     println!("{}", "editing done.".bright_blue());
+    Ok(())
+}
+
+pub fn rm(numbers: &[usize]) -> Result<()> {
+    use colored::Colorize;
+
+    let mut rulefile = Rulefile::load()?;
+    rulefile.rules = rulefile
+        .rules
+        .iter()
+        .enumerate()
+        .filter_map(|(i, rule)| {
+            let pos = i + 1;
+            if numbers.contains(&pos) {
+                println!("removed rule #{}.", pos.to_string().bright_red());
+                None
+            } else {
+                Some(rule)
+            }
+        })
+        .cloned()
+        .collect();
+
+    rulefile.save()?;
+    println!("done.");
     Ok(())
 }

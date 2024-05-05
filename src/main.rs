@@ -19,6 +19,11 @@ fn cli() -> Command {
         .subcommand(Command::new("clear").about("Clear all rules."))
         .subcommand(Command::new("ls").about("List all rules."))
         .subcommand(Command::new("edit").about("Open the file containing all rules for editing."))
+        .subcommand(
+            Command::new("rm")
+                .about("Remove given rules by number.")
+                .arg(args::numbers().required(true)),
+        )
 }
 
 fn main() -> anyhow::Result<()> {
@@ -31,6 +36,7 @@ fn main() -> anyhow::Result<()> {
         Some(("clear", _)) => commands::clear(),
         Some(("ls", _)) => commands::ls(),
         Some(("edit", _)) => commands::edit(),
+        Some(("rm", sub_args)) => commands::parse::rm(sub_args),
         _ => {
             cli().print_help()?;
             Ok(())

@@ -26,3 +26,13 @@ pub fn to() -> Arg {
         .value_name("PATH")
         .help("A directory to place matching files at.")
 }
+
+#[must_use]
+pub fn numbers() -> Arg {
+    Arg::new("numbers")
+        .long("numbers")
+        .short('n')
+        .value_name("NUMBERS")
+        .num_args(1..)
+        .help("A list of rule numbers (as listed by the ls subcommand).")
+}

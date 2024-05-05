@@ -13,7 +13,7 @@ use std::{
 pub mod args;
 pub mod commands;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Rule {
     /// A pattern to match against.
     matching: String,
@@ -33,7 +33,7 @@ impl From<&Rule> for String {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Rulefile {
     rules: Vec<Rule>,
 }
