@@ -16,12 +16,15 @@
         let
           overlays = [ (import rust) ];
           pkgs = import nixpkgs { inherit system overlays; };
-          rustToolchain = pkgs.pkgsBuildHost.rust-bin.fromRustupToolchainFile
+          toolchain = pkgs.pkgsBuildHost.rust-bin.fromRustupToolchainFile
             ./rust-toolchain.toml;
-          naersk-lib = pkgs.callPackage naersk { };
+          naersk-lib = pkgs.callPackage naersk {
+            cargo = toolchain;
+            rustc = toolchain;
+          };
         in {
           devShells.default = pkgs.mkShell {
-            buildInputs = with pkgs; [ rustToolchain just bacon cargo-udeps ];
+            buildInputs = with pkgs; [ toolchain just bacon cargo-udeps ];
           };
 
           packages.default = naersk-lib.buildPackage { src = ./.; };
