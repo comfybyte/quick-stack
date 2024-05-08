@@ -2,7 +2,6 @@ _default:
   just --list
 
 check:
-  nix fmt
   cargo clippy
 
 watch:
