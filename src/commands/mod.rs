@@ -93,11 +93,20 @@ pub fn sort() -> Result<()> {
                             eprintln!("can't stack file: {err:?}");
                         }
                     }
+                } else {
+                    println!(
+                        "{} {} {} {}",
+                        "moved".on_bright_blue().black(),
+                        old.display(),
+                        "--->".bright_blue(),
+                        new.display()
+                    );
                 }
             }
         }
     }
 
+    println!("\ndone.");
     Ok(())
 }
 
@@ -106,7 +115,7 @@ pub fn clear() -> Result<()> {
     rulefile.rules.clear();
     rulefile.save()?;
 
-    println!("Cleared all rules.");
+    println!("cleared all rules.");
     Ok(())
 }
 
