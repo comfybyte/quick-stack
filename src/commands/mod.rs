@@ -43,8 +43,11 @@ pub fn sort() -> Result<()> {
 
     // TODO: Optimise this.
     for rule in Rulefile::load()?.rules {
-        let mut target_files = match fs::read_dir(&rule.input) {
-            Ok(target_files) => target_files,
+        let input_paths = match fs::read_dir(&rule.input) {
+            Ok(target_files) => target_files
+                .flatten()
+                .map(|file| file.path())
+                .collect::<Vec<_>>(),
             Err(err) => {
                 warn!("skipping rule: `input` does not point to a readable directory:\nin rule: {rule:?}\ncause: {err:?}");
                 continue;
@@ -52,20 +55,17 @@ pub fn sort() -> Result<()> {
         };
 
         let matching = Regex::new(&rule.matching)?;
-        while let Some(Ok(file)) = target_files.next() {
-            let name = match file.file_name().into_string() {
-                Ok(name) => name,
-                Err(err) => {
-                    warn!("failed to read filename: {err:?}");
-                    continue;
-                }
+        for path in input_paths {
+            let Some(name) = path.file_name().and_then(|name| name.to_str()) else {
+                eprintln!("couldn't properly read input file name, likely not a valid UTF-8.");
+                continue;
             };
 
-            if matching.is_match(&name) {
+            if matching.is_match(name) {
                 let mut old = rule.input.clone();
-                old.push(&name);
+                old.push(name);
                 let mut new = rule.output.clone();
-                new.push(&name);
+                new.push(name);
 
                 if let Err(err) = fs::rename(&old, &new) {
                     match err.kind() {
