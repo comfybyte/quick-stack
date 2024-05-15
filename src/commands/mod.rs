@@ -1,16 +1,12 @@
+use crate::{Rule, Rulefile};
 use anyhow::{anyhow, Result};
 use colored::Colorize;
-use std::{
-    fs,
-    io::{self, stdout},
-    path::PathBuf,
-    process::Command,
-};
-use tracing::warn;
-
-use crate::{Rule, Rulefile};
+use std::{io::stdout, path::PathBuf, process::Command};
 
 pub mod parse;
+pub mod sort;
+
+pub use sort::*;
 
 pub fn add(matching: String, input: PathBuf, output: PathBuf) -> Result<()> {
     let rule = Rule {
@@ -34,79 +30,6 @@ pub fn add(matching: String, input: PathBuf, output: PathBuf) -> Result<()> {
 
     let last_num = rulefile.rules.len();
     println!("\nrule added as #{}.", last_num.to_string().blue());
-    Ok(())
-}
-
-pub fn sort() -> Result<()> {
-    use io::ErrorKind;
-    use regex::Regex;
-
-    // TODO: Optimise this.
-    for rule in Rulefile::load()?.rules {
-        let input_paths = match fs::read_dir(&rule.input) {
-            Ok(target_files) => target_files
-                .flatten()
-                .map(|file| file.path())
-                .collect::<Vec<_>>(),
-            Err(err) => {
-                warn!("skipping rule: `input` does not point to a readable directory:\nin rule: {rule:?}\ncause: {err:?}");
-                continue;
-            }
-        };
-
-        let matching = Regex::new(&rule.matching)?;
-        for path in input_paths {
-            let Some(name) = path.file_name().and_then(|name| name.to_str()) else {
-                eprintln!("couldn't properly read input file name, likely not a valid UTF-8.");
-                continue;
-            };
-
-            if matching.is_match(name) {
-                let mut old = rule.input.clone();
-                old.push(name);
-                let mut new = rule.output.clone();
-                new.push(name);
-
-                if let Err(err) = fs::rename(&old, &new) {
-                    match err.kind() {
-                        ErrorKind::NotFound => {
-                            println!("rule output directory not found, creating it...");
-
-                            if let Err(err) = fs::create_dir(&rule.output) {
-                                eprintln!("can't create output directory: {err:?}");
-                                continue;
-                            }
-
-                            println!("{}'{}'", "created".green(), &rule.output.display());
-
-                            if let Err(err) = fs::rename(&old, &new) {
-                                eprintln!("can't stack file: {err:?}");
-                            }
-                        }
-                        ErrorKind::NotADirectory => {
-                            eprintln!(
-                                "can't stack file: {} exists and is not a directory.",
-                                rule.output.display()
-                            );
-                        }
-                        _ => {
-                            eprintln!("can't stack file: {err:?}");
-                        }
-                    }
-                } else {
-                    println!(
-                        "{} {} {} {}",
-                        "moved".on_bright_blue().black(),
-                        old.display(),
-                        "--->".bright_blue(),
-                        new.display()
-                    );
-                }
-            }
-        }
-    }
-
-    println!("\ndone.");
     Ok(())
 }
 

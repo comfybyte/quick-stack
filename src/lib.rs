@@ -2,6 +2,7 @@
 #![deny(clippy::pedantic)]
 #![deny(clippy::unwrap_used)]
 #![allow(clippy::missing_errors_doc)]
+
 #![feature(io_error_more)]
 
 use anyhow::Result;
