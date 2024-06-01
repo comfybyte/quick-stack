@@ -54,7 +54,7 @@ pub fn ls() -> Result<()> {
         );
         rulefile.rules.iter().enumerate().for_each(|(i, rule)| {
             println!(
-                "[{}] {} {}\n    {} {} {} {}",
+                "[{}] {} {} {} {} {} {}",
                 i + 1,
                 "for".bright_blue(),
                 rule.matching,
