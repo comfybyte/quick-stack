@@ -23,12 +23,11 @@ pub fn add(args: &ArgMatches) -> Result<()> {
 }
 
 pub fn rm(args: &ArgMatches) -> Result<()> {
-    let numbers = match args.try_get_many::<String>("numbers") {
-        Ok(Some(numbers)) => numbers.clone(),
+    let numbers: Vec<usize> = match args.try_get_many::<String>("numbers") {
+        Ok(Some(numbers)) => numbers.flat_map(|n| n.parse::<usize>()).collect(),
         Ok(None) => unreachable!(),
         Err(err) => return Err(anyhow!("parsing error: {err:?}")),
     };
-    let numbers: Vec<usize> = numbers.flat_map(|n| n.parse::<usize>()).collect();
 
     super::rm(&numbers)?;
     Ok(())
