@@ -1,34 +1,39 @@
-use anyhow::{anyhow, Result};
 use clap::ArgMatches;
 
-pub fn add(args: &ArgMatches) -> Result<()> {
+use crate::errors::QSError;
+
+pub fn add(args: &ArgMatches) -> Result<(), QSError> {
     let matching = match args.try_get_one::<String>("matching") {
         Ok(Some(matching)) => matching.clone(),
         Ok(None) => unreachable!(),
-        Err(err) => return Err(anyhow!("parsing error: {err:?}")),
+        Err(err) => return Err(QSError::ParseFailed("matching".to_string(), err)),
     };
     let input = match args.try_get_one::<String>("input") {
         Ok(Some(from)) => from.clone(),
         Ok(None) => unreachable!(),
-        Err(err) => return Err(anyhow!("parsing error: {err:?}")),
+        Err(err) => return Err(QSError::ParseFailed("input".to_string(), err)),
     };
     let output = match args.try_get_one::<String>("output") {
         Ok(Some(to)) => to.clone(),
         Ok(None) => unreachable!(),
-        Err(err) => return Err(anyhow!("parsing error: {err:?}")),
+        Err(err) => return Err(QSError::ParseFailed("output".to_string(), err)),
     };
 
-    super::add(matching, input.into(), output.into())?;
-    Ok(())
+    super::add(matching, input.into(), output.into())
 }
 
-pub fn rm(args: &ArgMatches) -> Result<()> {
+pub fn rm(args: &ArgMatches) -> Result<(), QSError> {
     let numbers: Vec<usize> = match args.try_get_many::<String>("numbers") {
         Ok(Some(numbers)) => numbers.flat_map(|n| n.parse::<usize>()).collect(),
         Ok(None) => unreachable!(),
-        Err(err) => return Err(anyhow!("parsing error: {err:?}")),
+        Err(err) => return Err(QSError::ParseFailed("numbers".to_string(), err)),
     };
 
-    super::rm(&numbers)?;
+    if numbers.is_empty() {
+        println!("nothing to do.");
+    } else {
+        super::rm(&numbers)?;
+    }
+
     Ok(())
 }

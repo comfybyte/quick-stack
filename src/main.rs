@@ -1,4 +1,5 @@
 use clap::{crate_version, Command};
+use colored::Colorize;
 use quick_stack::{args, commands};
 
 fn cli() -> Command {
@@ -26,11 +27,11 @@ fn cli() -> Command {
         )
 }
 
-fn main() -> anyhow::Result<()> {
+fn main() {
     better_panic::install();
     tracing_subscriber::fmt::init();
 
-    match cli().get_matches().subcommand() {
+    if let Err(err) = match cli().get_matches().subcommand() {
         Some(("add", sub_args)) => commands::parse::add(sub_args),
         Some(("sort", _)) => commands::sort(),
         Some(("clear", _)) => commands::clear(),
@@ -38,10 +39,10 @@ fn main() -> anyhow::Result<()> {
         Some(("edit", _)) => commands::edit(),
         Some(("rm", sub_args)) => commands::parse::rm(sub_args),
         _ => {
-            cli().print_help()?;
+            cli().print_help().expect("cannot print help.");
             Ok(())
         }
-    }?;
-
-    Ok(())
+    } {
+        eprintln!("{} {err}", " error ".on_red().black());
+    }
 }

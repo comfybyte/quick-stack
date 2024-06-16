@@ -9,10 +9,12 @@ use std::{
     io::{Read, Write},
     path::PathBuf,
 };
-use thiserror::Error;
 
 pub mod args;
 pub mod commands;
+pub mod errors;
+
+use crate::errors::RulefileError;
 
 #[derive(Debug, Clone)]
 pub struct Rule {
@@ -20,6 +22,21 @@ pub struct Rule {
     input: PathBuf,
     output: PathBuf,
 }
+
+impl Rule {
+    fn new(matching: String, input: PathBuf, output: PathBuf) -> Option<Self> {
+        if regex_builds(&matching) {
+            Some(Self {
+                matching,
+                input,
+                output,
+            })
+        } else {
+            None
+        }
+    }
+}
+
 impl From<&Rule> for String {
     fn from(value: &Rule) -> Self {
         format!(
@@ -36,22 +53,6 @@ pub enum RuleField {
     Matching,
     Input,
     Output,
-}
-
-#[derive(Error, Debug)]
-pub enum RulefileError {
-    #[error("Cannot read rule file's contents: {0:?}.")]
-    Read(std::io::Error),
-    #[error("Cannot write rule file changes: {0:?}.")]
-    Write(std::io::Error),
-    #[error("Cannot check rule file path: {0:?}.")]
-    Check(std::io::Error),
-    #[error("Cannot find XDG data directory. Check if $XDG_DATA_HOME is set.")]
-    Find,
-    #[error("Cannot parse rule #{1}, it's missing field: {0:?}. Likely from a malformatted edit.")]
-    Parse(RuleField, usize),
-    #[error("Cannot parse file contents into UTF-8 string.")]
-    UTF8Parse,
 }
 
 #[derive(Debug, Default, Clone)]
@@ -148,4 +149,8 @@ impl From<&Rulefile> for String {
             .collect::<Vec<_>>()
             .join("\n\n")
     }
+}
+
+fn regex_builds(value: &str) -> bool {
+    regex::Regex::new(value).is_ok()
 }

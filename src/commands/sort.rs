@@ -5,9 +5,9 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::Rulefile;
+use crate::{errors::QSError, Rulefile};
 
-pub fn sort() -> anyhow::Result<()> {
+pub fn sort() -> Result<(), QSError> {
     let mut targets = HashMap::<PathBuf, Vec<(String, PathBuf)>>::new();
     Rulefile::load()?.rules.into_iter().for_each(|rule| {
         let new = (rule.matching, rule.output);
