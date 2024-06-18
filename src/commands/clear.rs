@@ -1,9 +1,9 @@
-use crate::{errors::QSError, Rulefile};
+use crate::{errors::QSError, rules::Rulefile};
 
 pub fn clear() -> Result<(), QSError> {
     let mut rulefile = Rulefile::load()?;
     rulefile.rules.clear();
-    rulefile.save()?;
+    rulefile.commit()?;
 
     println!("cleared all rules.");
     Ok(())

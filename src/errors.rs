@@ -1,7 +1,7 @@
 use clap::parser::MatchesError;
 use thiserror::Error;
 
-use crate::RuleField;
+use crate::rules::RuleField;
 
 #[derive(Error, Debug)]
 pub enum QSError {

@@ -1,7 +1,7 @@
 use colored::Colorize;
 use std::{io::stdout, process::Command};
 
-use crate::{errors::QSError, Rulefile};
+use crate::{errors::QSError, rules::Rulefile};
 
 pub fn edit() -> Result<(), QSError> {
     let editor = std::env::var("EDITOR").map_err(|_| QSError::EditorUnset)?;

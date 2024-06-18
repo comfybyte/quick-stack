@@ -1,4 +1,4 @@
-use crate::{errors::QSError, Rulefile};
+use crate::{errors::QSError, rules::Rulefile};
 use colored::Colorize;
 
 pub fn ls() -> Result<(), QSError> {

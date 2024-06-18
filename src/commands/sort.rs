@@ -5,7 +5,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::{errors::QSError, Rulefile};
+use crate::{errors::QSError, rules::Rulefile};
 
 pub fn sort() -> Result<(), QSError> {
     let mut targets = HashMap::<PathBuf, Vec<(String, PathBuf)>>::new();
