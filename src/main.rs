@@ -28,8 +28,9 @@ fn cli() -> Command {
 }
 
 fn main() {
-    better_panic::install();
-    tracing_subscriber::fmt::init();
+    if cfg!(debug_assertions) {
+        better_panic::install();
+    }
 
     if let Err(err) = match cli().get_matches().subcommand() {
         Some(("add", sub_args)) => commands::parse::add(sub_args),
