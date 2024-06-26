@@ -1,38 +1,38 @@
 ## 📦️⚙️ quick-stack
-<div align="center">
 
-A simple command line file organiser for cleaning directories that tend to get cluttered very often
+a simple command line file organiser for cleaning directories that often get cluttered
 with files of similar names.
+<div align="right">
 
 [![built with nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
 </div>
 
 
-## Installing
-### With Nix
-This project is a flake, consume it your way.
+## installing
+### with Nix
+this project is a flake, consume it your way.
 
-Try it out with:
+try it out with:
 ```bash
-nix run github:comfybyte/quick-stack
+nix run github:mtlhrt/quick-stack
 ```
 
-Or install it imperatively with:
+or install it imperatively with:
 ```bash
-nix profile install github:comfybyte/quick-stack
+nix profile install github:mtlhrt/quick-stack
 ```
 
-Or consume it in your flake (recommended).
+or however else you want, the package is exposed as `packages.default`.
 
-### From source
-You can `git clone` this repository and run `cargo install --path .` if you have Rust installed.
-Requires a nightly toolchain (`rustup toolchain install nightly`).
+### from source
+you can `git clone` this repository and run `cargo install --path .` if you have Rust installed.
+requires a nightly toolchain (`rustup toolchain install nightly`).
 
-## Usage
-We work with rules here, define what should go where, then snap your fingers and everything gets done.
+## usage
+we work with rules here, define what should go where, then snap your fingers and everything gets done.
 
-#### Creating a rule
-Use `quick-stack add` to add a new rule, it takes three arguments: `-m` is a regular expression to match files ,
+#### creating a rule
+use `quick-stack add` to add a new rule, it takes three arguments: `-m` is a regular expression to match files ,
 `-i` is a path to read files from, and `-o` is a path to place files at. For example:
 ```sh
 quick-stack add -m ".png$" -i ~/downloads -o ~/imgs
@@ -41,12 +41,9 @@ quick-stack add -m "(?i)(*.)gundam(.*).mkv$" -i ~/downloads -o ~/anime/gundam
 ```
 
 
-#### Sorting
-Use `quick-stack sort` to go over all rules, sorting files accordingly.
-This skips rules that read from directories that can't be accessed, and creates ones
+#### sorting
+use `quick-stack sort` to go over all rules, sorting files accordingly.
+this skips rules that read from directories that can't be accessed, and creates ones
 that don't exist.
 
-See `quick-stack --help` for other useful commands.
-
-****
-*Yes, the name is a [Terraria reference](https://terraria.wiki.gg/wiki/Storage_items#Quick_Stack)*.
+see `quick-stack --help` for other useful commands.
